@@ -1,21 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import { InjectConnection } from '@nestjs/mongoose';
-import { Connection } from 'mongoose';
-import { User, UserSchema } from './schema/user.schema';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { CreateUserCommand } from './commands/create-user.command';
+import { ReadUsersQuery } from './queries/read-user.query';
 
 @Injectable()
 export class AppService {
-  constructor(@InjectConnection('WRITE') private writeCon: Connection,  
-  @InjectConnection('READ') private readCon: Connection) {}
+  constructor(private commandBus: CommandBus, private queryBus: QueryBus) {}
 
   getUser(): any {
-    return this.readCon.model(User.name, UserSchema).find({})
+    return this.queryBus.execute(
+      new ReadUsersQuery()
+    )
   }
 
   createUser(): any {
-    return this.writeCon.model(User.name, UserSchema).create({
-      email: "abcd@gmail.com",
-      name: "abcd"
-    })
+    return this.commandBus.execute(
+      new CreateUserCommand("new@gmail.com", "new")
+    )
   }
 }
