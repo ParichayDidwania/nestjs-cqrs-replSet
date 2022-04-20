@@ -13,9 +13,9 @@ export class AppService {
     )
   }
 
-  createUser(): any {
+  createUser(email: string, name: string): any {
     return this.commandBus.execute(
-      new CreateUserCommand("new@gmail.com", "new")
+      new CreateUserCommand(email, name)
     )
   }
 }
